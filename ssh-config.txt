@@ -1,3 +1,5 @@
+## Will only work if both computers are connected to tailscale network
+
 Host 100.92.112.53
   HostName 100.92.112.53
   User robot-2
