@@ -6,10 +6,10 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 # Motor Driver Pin Definitions
-L_EN = 20; # Reverse/Enable (Active HIGH)
-R_EN = 21; # Forward/Enable (Active HIGH)
-LPWM = 19; # Reverse/PWM (Active HIGH)
-RPWM = 26; # Forward/PWM (Active HIGH)
+L_EN = 2; # Reverse/Enable (Active HIGH)
+R_EN = 3; # Forward/Enable (Active HIGH)
+LPWM = 4; # Reverse/PWM (Active HIGH)
+RPWM = 17; # Forward/PWM (Active HIGH)
 
 # Set all of our PINS to output
 GPIO.setup(L_EN, GPIO.OUT)
