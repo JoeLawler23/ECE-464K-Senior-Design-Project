@@ -1,6 +1,5 @@
 import RPi.GPIO as GPIO
 import time
-from enum import Enum
 
 # GPIO Layout
 GPIO.setmode(GPIO.BCM)  
