@@ -70,4 +70,4 @@ class Motor:
 
 def motor_init():
     left_motor = Motor(2, 3, 4, 17)
-    right_motor = Motor() #TODO update for right motor
+    right_motor = Motor(19, 26, 21, 20)
