@@ -68,6 +68,9 @@ class Motor:
         pwm.stop()
         self.stop()
 
-def motor_init():
-    left_motor = Motor(2, 3, 4, 17)
-    right_motor = Motor(19, 26, 21, 20)
+
+left_motor = Motor(2, 3, 4, 17)
+right_motor = Motor(19, 26, 21, 20)
+
+left_motor.drive(Direction.FORWARD, 100, 10)
+right_motor.drive(Direction.FORWARD, 100, 10)
