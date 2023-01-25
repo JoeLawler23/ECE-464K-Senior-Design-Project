@@ -19,6 +19,7 @@ GPIO.setup(LPWM, GPIO.OUT)
 
 # Drive the motors forward
 GPIO.output(R_EN, True)
+GPIO.output(L_EN, True)
 
 # Setup PWM on right motor
 rpwm= GPIO.PWM(RPWM, 100)

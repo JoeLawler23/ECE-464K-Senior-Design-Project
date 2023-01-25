@@ -39,19 +39,17 @@ class Motor:
         # Init pwm
         pwm = None
 
+        # Enable pins
+        GPIO.output(self.ren_pin, True)
+        GPIO.output(self.fen_pin, True)
+
         # Set direction & Setup PWM
         if (direction == Direction.FORWARD):
-            # Enable pins
-            GPIO.output(self.fen_pin, True)
-            GPIO.output(self.ren_pin, False)
 
             # Setup PWM
             pwm = GPIO.PWM(self.fpwm_pin, speed)
 
         elif (direction == Direction.REVERSE):
-            # Enable pins
-            GPIO.output(self.ren_pin, True)
-            GPIO.output(self.fen_pin, False)
 
             # Setup PWM
             pwm = GPIO.PWM(self.rpwm_pin, speed)
@@ -75,7 +73,9 @@ class Motor:
 
 
 left_motor = Motor(2, 3, 4, 17)
-right_motor = Motor(19, 26, 21, 20)
+# right_motor = Motor(19, 26, 21, 20)
 
 left_motor.drive(Direction.FORWARD, 100, 10)
-right_motor.drive(Direction.FORWARD, 100, 10)
+left_motor.drive(Direction.REVERSE, 100, 10)
+
+# right_motor.drive(Direction.FORWARD, 100, 10)
