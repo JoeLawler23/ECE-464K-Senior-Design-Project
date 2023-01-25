@@ -20,6 +20,7 @@ def accept_wrapper(sock):
     data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(conn, events, data=data)
+    conn.sendall(b"data")
 
 def service_connection(key, mask):
     sock = key.fileobj
