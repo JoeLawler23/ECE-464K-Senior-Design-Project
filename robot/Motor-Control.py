@@ -4,6 +4,10 @@ from enum import Enum
 
 DRIVE_TICKS = 0.25
 
+# GPIO Layout
+GPIO.setmode(GPIO.BCM)  
+GPIO.setwarnings(False)
+
 class Direction(Enum): 
     FORWARD = 1
     REVERSE = 2
