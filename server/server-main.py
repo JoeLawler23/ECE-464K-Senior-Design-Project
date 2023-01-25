@@ -10,7 +10,7 @@ sel = selectors.DefaultSelector()
 # robot - 2: 100.92.112.53
 # server: 100.107.15.32
 # Robot-2 is the server and Robot-1 is the client **server is offline in this demo**
-HOST = "100.92.112.53"  # Standard loopback interface address (localhost)
+HOST = "100.107.15.32"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
