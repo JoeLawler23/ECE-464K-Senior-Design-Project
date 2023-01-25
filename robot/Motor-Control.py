@@ -62,6 +62,7 @@ class Motor:
         # Drive loop
         drive_ticks = 0
         pwm.start(speed)
+        pwm.ChangeDutyCycle(speed)
         while(drive_ticks < ticks+self.encoder_ticks):
             print("Driving " + str(drive_ticks))
             #TODO Need to change this to encoder ticks
