@@ -62,8 +62,8 @@ while 1:
 
         counter = 10
  
-Enc_A = 17  
-Enc_B = 27  
+Enc_A = 14  
+Enc_B = 15
  
  
 def init():
