@@ -82,16 +82,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             char = getch()
             if char == "a":
                 x = {"direction" : "left"}
-                conn.sendall(bytes(json.dumps(x)))
+                conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "d":
                 x = {"direction" : "right"}
-                conn.sendall(bytes(json.dumps(x)))
+                conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "w":
                 x = {"direction" : "forward"}
-                conn.sendall(bytes(json.dumps(x)))
+                conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "s":
                 x = {"direction" : "backward"}
-                conn.sendall(bytes(json.dumps(x)))
+                conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "q":
                 conn.sendall(b"quit")
                 break
