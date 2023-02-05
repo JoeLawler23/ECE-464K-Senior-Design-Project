@@ -2,6 +2,7 @@ import sys
 import socket
 import selectors
 import types
+import json
 
 #import motor
 # robot - 1: 100.75.56.66
@@ -65,7 +66,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         data = s.recv(1024)
         if data == b"quit":
             break
-        print(data)
+        y = json.loads(data)
+        print(y["direction"])
 
 #print(f"Received {data!r}")
 #sel = selectors.DefaultSelector()

@@ -3,6 +3,7 @@ import socket
 import selectors
 import types
 import keyboard
+import json
 sel = selectors.DefaultSelector()
 
 # ...
@@ -73,23 +74,28 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     s.listen()
     conn, addr = s.accept()
-    while True:
-        with conn:
-            print(f"Connected by {addr}")
-            while True:
-                char = getch()
-                if char == "a":
-                    conn.sendall(b"left")
-                elif char == "d":
-                    conn.sendall(b"right")
-                elif char == "w":
-                    conn.sendall(b"forward")
-                elif char == "s":
-                    conn.sendall(b"backward")
-                elif char == "q":
-                    conn.sendall(b"quit")
-                    break
-                else:
-                    print(char)
+   
+
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            char = getch()
+            if char == "a":
+                x = {"direction" : "left"}
+                conn.sendall(bytes(json.dumps(x)))
+            elif char == "d":
+                x = {"direction" : "right"}
+                conn.sendall(bytes(json.dumps(x)))
+            elif char == "w":
+                x = {"direction" : "forward"}
+                conn.sendall(bytes(json.dumps(x)))
+            elif char == "s":
+                x = {"direction" : "backward"}
+                conn.sendall(bytes(json.dumps(x)))
+            elif char == "q":
+                conn.sendall(b"quit")
+                break
+            else:
+                print(char)
 
     s.close()
