@@ -3,7 +3,7 @@ import socket
 import selectors
 import types
 import json
-
+import motor.py as motor
 #import motor
 # robot - 1: 100.75.56.66
 # robot - 2: 100.92.112.53
@@ -53,7 +53,8 @@ PORT = 65432  # The port used by the server
 #            print("Sending  to connections")
 #            sent = sock.send(data.outb)  # Should be ready to write
 #            data.outb = data.outb[sent:]
-
+left_motor = Motor(2, 3, 4, 17, 14, 15)
+right_motor = Motor(19, 26, 21, 20, 5, 6)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     connected = False
     while not connected:
@@ -65,9 +66,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         data = s.recv(1024)
         if data == b"quit":
+            left_motor.stop()
+            right_motor.stop()
             break
         y = json.loads(data)
+        left_motor.drive(y["direction"], 100, 10)
+        right_motor.drive(y["direction"], 100, 10)
         print(y["direction"])
+
 
 #print(f"Received {data!r}")
 #sel = selectors.DefaultSelector()

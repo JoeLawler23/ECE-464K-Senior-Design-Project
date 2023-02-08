@@ -116,7 +116,7 @@ class Motor:
         self.stop()
 
 left_motor = Motor(2, 3, 4, 17, 14, 15)
-#right_motor = Motor(19, 26, 21, 20, todo, todo)
+#right_motor = Motor(19, 26, 21, 20, 5, 6)
 #28 ticks should be one rotation of the wheel but there is a decent amount of leeway when we were testing
 left_motor.drive(Direction.FORWARD, 100, 40)
 #left_motor.drive(Direction.REVERSE, 100, 40)

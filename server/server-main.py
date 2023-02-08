@@ -50,10 +50,10 @@ def myThread(conn, addr, s, port):
                 x = {"direction" : "right"}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "w":
-                x = {"direction" : "forward"}
+                x = {"direction" : 1}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "s":
-                x = {"direction" : "backward"}
+                x = {"direction" : 2}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "q":
                 conn.sendall(b"quit")
