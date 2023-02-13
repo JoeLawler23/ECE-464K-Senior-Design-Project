@@ -2,20 +2,36 @@ import RPi.GPIO as GPIO
 import time
 from enum import Enum
 
-DRIVE_TICKS = 0.25
-
 # GPIO Layout
 GPIO.setmode(GPIO.BCM)  
 GPIO.setwarnings(False)
 
+# Constants
+# TODO needs to be adjusted
+TICKS_PER_CM = 50
+
+# Direction Enum
 class Direction(Enum): 
     FORWARD = 1
     REVERSE = 2
 
+# Motor Class
 class Motor:
 
-    def __init__(self, ren_pin, fen_pin, rpwm_pin, fpwm_pin, encodera, encoderb):
-        # Assign pins
+    def __init__(self, ren_pin: int, fen_pin: int, rpwm_pin: int, fpwm_pin: int, etick_pin: int, eref_pin: int):
+        """
+        Initializes motor controller and encoder for a given motor
+
+        Args:
+            ren_pin (int): Reverse/Enable pin 
+            fen_pin (int): Forward/Enable pin
+            rpwm_pin (int): Reverse/PWM pin 
+            fpwm_pin (int): Forward/PWM pin 
+            etick_pin (int): Encoder tick pin
+            eref_pin (int): Encoder reference pin
+        """
+
+        # Assign motor pins
         self.ren_pin = ren_pin # Reverse/Enable (Active HIGH)
         self.fen_pin = fen_pin # Forward/Enable (Active HIGH)
         self.rpwm_pin = rpwm_pin # Reverse/PWM (Active HIGH)
@@ -27,27 +43,38 @@ class Motor:
         GPIO.setup(self.rpwm_pin, GPIO.OUT)
         GPIO.setup(self.fpwm_pin, GPIO.OUT)
 
-        # Encoder init
-        self.encoder_pina = encodera
-        self.encoder_pinb = encoderb
+        # Encoder pins
+        self.etick_pin = etick_pin
+        self.eref_pin = eref_pin
         self.encoder_ticks = 0
-        #encoder pins
-        
-        GPIO.setup(self.encoder_pinb, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(self.encoder_pina, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        #GPIO.add_event_detect(self.encoder_pina, GPIO.RISING, callback=rotation_decode, bouncetime=10)
-        #GPIO.add_event_detect(self.encoder_pinb, GPIO.RISING, callback=rotation_decode, bouncetime=10)
+
+        # Set encoder pins
+        GPIO.setup(self.eref_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.eref_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def stop(self):
+        """
+        Stops motor by turning off forward and reverse pins
+        """        
         GPIO.output(self.ren_pin, False)
         GPIO.output(self.fen_pin, False)
 
-    def drive(self, direction: Direction, speed: int, ticks: int):
+    def drive(self, direction: Direction, speed: int, distance: int):
+        """
+        Drive for a given distance
 
+        Args:
+            direction (Direction): Direction to drive in, FORWARD/REVERSE
+            speed (int): Speed to drive at (0-100)
+            distance (int): Distance in cm to drive (Value must be positive)
+        """
+
+        # Clip inputs
+        speed = abs(speed)
+        distance = abs(distance)
+        
         # Init pwm
         pwm = None
-        
-        
         
         # Enable pins
         GPIO.output(self.ren_pin, True)
@@ -67,106 +94,42 @@ class Motor:
             print("Invalid direction")
             return
 
-        # Drive loop
+        # Calculate ticks from distance
+        ticks = int(distance * TICKS_PER_CM)
+
+        # Init vars for driving
         drive_ticks = 0
-        clklaststate = GPIO.input(self.encoder_pina)
-        printclk = 1
+        clklaststate = GPIO.input(self.etick_pin)
+
+        # Start pwm
         pwm.start(speed)
         pwm.ChangeDutyCycle(speed)
-        # while(printclk):
-        #     print("Driving " + str(drive_ticks))
-        #     time.sleep(DRIVE_TICKS)
+
+        # Drive loop
         while(drive_ticks < ticks+self.encoder_ticks):
-            print("Driving " + str(drive_ticks))
-            
-            
-            #TODO Need to change this to encoder ticks
-            clkState = GPIO.input(self.encoder_pina)
-            dtState = GPIO.input(self.encoder_pinb)
+
+            # Get encoder input
+            clkState = GPIO.input(self.etick_pin)
+
+            # Increment drive ticks if encoder tick
             if clkState != clklaststate:
-                # if dtState != clkState:
-                #     drive_ticks += 1
-                # else:
-                #     drive_ticks -= 1
                 drive_ticks += 1
                 
+            # Update encoder state
             clklaststate = clkState
+
+            # Wait to process
             time.sleep(0.01)
-            # if (Switch_A == 1) and (Switch_B == 0):
-            #     drive_ticks += 1
-            #     print ("direction -> ", drive_ticks)
-            #     if Switch_B == 0:
-            #         Switch_B = GPIO.input(self.encoder_pinb)
-            #     if Switch_B == 1:
-            #         Switch_B = GPIO.input(self.encoder_pinb)
-                
- 
-            # elif (Switch_A == 1) and (Switch_B == 1):
-            #     drive_ticks -= 1
-            #     print ("direction <- ", drive_ticks)
-            #     if Switch_A == 1:
-            #         Switch_A = GPIO.input(self.encoder_pina)
-
-            # #drive_ticks += 1 
-            # time.sleep(0.025)
-
         
         # Stop
         pwm.stop()
         self.stop()
 
-left_motor = Motor(2, 3, 4, 17, 14, 15)
-#right_motor = Motor(19, 26, 21, 20, 5, 6)
-#28 ticks should be one rotation of the wheel but there is a decent amount of leeway when we were testing
-left_motor.drive(Direction.FORWARD, 100, 40)
-#left_motor.drive(Direction.REVERSE, 100, 40)
-
-#right_motor.drive(Direction.FORWARD, 100, 10)
-#############################################################
-#counter = 10
- 
-# Enc_A = 14  
-# Enc_B = 15
- 
-# def init():
-#     print ("Rotary Encoder Test Program")
-#     GPIO.setwarnings(True)
-#     GPIO.setmode(GPIO.BCM)
-#     GPIO.setup(Enc_A, GPIO.IN)
-#     GPIO.setup(Enc_B, GPIO.IN)
-#     GPIO.add_event_detect(Enc_A, GPIO.RISING, callback=rotation_decode, bouncetime=10)
-#     return
- 
- 
-# def rotation_decode(Enc_A):
-#     global counter
-#     sleep(0.002)
-#     Switch_A = GPIO.input(Enc_A)
-#     Switch_B = GPIO.input(Enc_B)
- 
-#     if (Switch_A == 1) and (Switch_B == 0):
-#         counter += 1
-#         print ("direction -> ", counter)
-#         while Switch_B == 0:
-#             Switch_B = GPIO.input(Enc_B)
-#         while Switch_B == 1:
-#             Switch_B = GPIO.input(Enc_B)
-        
- 
-#     elif (Switch_A == 1) and (Switch_B == 1):
-#         counter -= 1
-#         print ("direction <- ", counter)
-#         while Switch_A == 1:
-#             Switch_A = GPIO.input(Enc_A)
-#         return
-#     else:
-#         return
- 
-# def main():
-#     try:
-#         init()
-#         while True :
-#             sleep(1)
- 
-#     except KeyboardInterrupt:
-#         GPIO.cleanup()
+    def testMotor(self):
+        """
+        Test motor by driving forward and reverse
+        """
+        print("DRIVE MOTOR FORWARD 40cm\n")
+        self.drive(Direction.FORWARD, 100, 40)
+        print("DRIVE MOTOR BACKWARD 40cm\n")
+        self.drive(Direction.REVERSE, 100, 40)
