@@ -8,8 +8,13 @@ import threading
 import signal
 import time
 import multiprocessing
+from enum import Enum
 sel = selectors.DefaultSelector()
 
+
+class Direction(Enum): 
+    FORWARD = 1
+    REVERSE = 2
 # ...
 # robot - 1: 100.75.56.66
 # robot - 2: 100.92.112.53
@@ -23,11 +28,13 @@ threads = []
 mySocket = 0
 
  
-def handler(signum, frame):
-    mySocket.close()
+def handler(signum, frame): #for CTRL-C for reboot
+    mySocket.shutdown()
+    for i in threads:
+        mySocket.close()
     sys.exit()
 
-def getch():
+def getch(): #not necessary, just used for testing
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -44,19 +51,36 @@ def myThread(conn, addr, s, port):
         while True:
             char = getch()
             if char == "a":
-                x = {"direction" : "left"}
+                x = {"COMMAND_TYPE" : "TURN", #DRIVE, TURN, STOP
+                    "HEADING": 20,
+                    "SPEED": 80,
+                    "DIRECTION": "LEFT",
+                    "DISTANCE": None}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "d":
-                x = {"direction" : "right"}
+                x = {"COMMAND_TYPE" : "TURN", #DRIVE, TURN, STOP
+                    "HEADING": 20, 
+                    "SPEED": 80,
+                    "DIRECTION": "RIGHT",
+                    "DISTANCE": None}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "w":
-                x = {"direction" : 1}
+                x = {"COMMAND_TYPE" : "DRIVE", #DRIVE, TURN, STOP
+                    "HEADING": None, 
+                    "SPEED": 80,
+                    "DIRECTION": "FORWARD",
+                    "DISTANCE": 50}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "s":
-                x = {"direction" : 2}
+                x = {"COMMAND_TYPE" : "DRIVE", #DRIVE, TURN, STOP
+                    "HEADING": None, 
+                    "SPEED": 80,
+                    "DIRECTION": "BACKWARD",
+                    "DISTANCE": 50}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "q":
-                conn.sendall(b"quit")
+                x = {"COMMAND_TYPE": "STOP"}
+                conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
                 break
             else:
                 print(char)
@@ -77,6 +101,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         threads.append(thisThread)
 for i in threads:
     i.join()
+s.shutdown()
 s.close()
 
         

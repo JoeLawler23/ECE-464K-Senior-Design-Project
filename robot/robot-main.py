@@ -3,7 +3,8 @@ import socket
 import selectors
 import types
 import json
-import motor.py as motor
+import motor as motor
+import threading
 
 # IPs
 # robot - 1: 100.75.56.66
@@ -14,8 +15,8 @@ PORT = 65432  # The port used by the server
 
 # Init motors
 # TODO make sure forward is forward for both sides
-left_motor = motor(2, 3, 4, 17, 14, 15)
-right_motor = motor(19, 26, 21, 20, 5, 6)
+left_motor = motor.Motor(2, 3, 4, 17, 14, 15)
+right_motor = motor.Motor(19, 26, 21, 20, 5, 6)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
 
@@ -51,8 +52,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
             speed = command["SPEED"]
 
             # TODO MAKE THREAD
-            left_motor.drive(direction, speed, distance)
-            right_motor.drive(direction, speed, distance)
+            leftMotor = threading(target = left_motor.drive, args = (direction, speed, distance))
+            rightMotor = threading(target = right_motor.drive, args = (direction, speed, distance))
+            leftMotor.start()
+            rightMotor.start()
+            leftMotor.join()
+            rightMotor.join()
 
         elif(command["COMMAND_TYPE"] == "TURN"):
             # TURN
@@ -70,12 +75,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
             # Turn left or right
             if(direction == "LEFT"):
                 # TODO MAKE THREAD
-                left_motor.drive("REVERSE", speed, distance)
-                right_motor.drive("FORWARD", speed, distance)
+                leftMotor = threading(target = left_motor.drive, args = ("REVERSE", speed, heading))
+                rightMotor = threading(target = right_motor.drive, args = ("FORWARD", speed, heading))
+                leftMotor.start()
+                rightMotor.start()
+                leftMotor.join()
+                rightMotor.join()
             elif(direction == "RIGHT"):
                 # TODO MAKE THREAD
-                left_motor.drive("FORWARD", speed, distance)
-                right_motor.drive("REVERSE", speed, distance)
+                leftMotor = threading(target = left_motor.drive, args = ("FORWARD", speed, heading))
+                rightMotor = threading(target = right_motor.drive, args = ("REVERSE", speed, heading))
+                leftMotor.start()
+                rightMotor.start()
+                leftMotor.join()
+                rightMotor.join()
 
         elif(command["COMMAND_TYPE"] == "STOP"):
             # STOP
