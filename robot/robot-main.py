@@ -4,43 +4,89 @@ import selectors
 import types
 import json
 import motor.py as motor
-#import motor
+
+# IPs
 # robot - 1: 100.75.56.66
 # robot - 2: 100.92.112.53
 # server: 100.107.15.32
-# Robot-2 is the server and Robot-1 is the client **server is offline in this demo**
 HOST = "100.107.15.32"  # The server's hostname or IP address
 PORT = 65432  # The port used by the server
 
-left_motor = Motor(2, 3, 4, 17, 14, 15)
-right_motor = Motor(19, 26, 21, 20, 5, 6)
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+# Init motors
+# TODO make sure forward is forward for both sides
+left_motor = motor(2, 3, 4, 17, 14, 15)
+right_motor = motor(19, 26, 21, 20, 5, 6)
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
+
+    # Init connection
     connected = False
+
+    # Attempt to connect to server
     while not connected:
         try:
-            s.connect((HOST, PORT))
+            robot.connect((HOST, PORT))
             connected = True
         except:
             connected = False
+
+    # Connected to server
     while True:
-        data = s.recv(1024)
-        if data == b"quit":
+
+        # Receive data
+        data = robot.recv(1024)
+
+        # Load in data
+        command = json.loads(data)
+
+        # Command structure
+        # COMMAND_TYPE - DRIVE,TURN,STOP
+        if (command["COMMAND_TYPE"] == "DRIVE"):
+            # DRIVE
+            # Direction - FORWARD,REVERSE
+            # Distance(cm) - #
+            # Speed - 0-100
+            direction = command["DIRECTION"]
+            distance = command["DISTANCE"]
+            speed = command["SPEED"]
+
+            # TODO MAKE THREAD
+            left_motor.drive(direction, speed, distance)
+            right_motor.drive(direction, speed, distance)
+
+        elif(command["COMMAND_TYPE"] == "TURN"):
+            # TURN
+            # Heading - 0-360
+            # Speed - 0-100
+            # Direction - LEFT,RIGHT
+            heading = command["HEADING"]
+            speed = command["SPEED"]
+            direction = command["DIRECTION"]
+
+            # Calculate distance based on heading
+            # TODO
+            distance = 0
+
+            # Turn left or right
+            if(direction == "LEFT"):
+                # TODO MAKE THREAD
+                left_motor.drive("REVERSE", speed, distance)
+                right_motor.drive("FORWARD", speed, distance)
+            elif(direction == "RIGHT"):
+                # TODO MAKE THREAD
+                left_motor.drive("FORWARD", speed, distance)
+                right_motor.drive("REVERSE", speed, distance)
+
+        elif(command["COMMAND_TYPE"] == "STOP"):
+            # STOP
+            # No args
             left_motor.stop()
             right_motor.stop()
-            break
-        y = json.loads(data)
-
-        # Drive - (Destination (x,y,h), Speed)
-        # Turn - (h, Speed)
 
         # Send back
         # Hits something
         # Stops
         # Kinect
-
-        left_motor.drive(y["direction"], 100, 10)
-        right_motor.drive(y["direction"], 100, 10)
-        print(y["direction"])
 
 
 #print(f"Received {data!r}")
