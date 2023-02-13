@@ -10,6 +10,8 @@ GPIO.setwarnings(False)
 # TODO needs to be adjusted
 TICKS_PER_CM = 50
 
+
+
 # Direction Enum
 class Direction(Enum): 
     FORWARD = 1
@@ -18,7 +20,7 @@ class Direction(Enum):
 # Motor Class
 class Motor:
 
-    def __init__(self, ren_pin: int, fen_pin: int, rpwm_pin: int, fpwm_pin: int, etick_pin: int, eref_pin: int, lims_pin: int, limnc_pin: int):
+    def __init__(self, ren_pin: int, fen_pin: int, rpwm_pin: int, fpwm_pin: int, etick_pin: int, eref_pin: int):
         """
         Initializes motor controller and encoder for a given motor
 
@@ -29,8 +31,6 @@ class Motor:
             fpwm_pin (int): Forward/PWM pin 
             etick_pin (int): Encoder tick pin
             eref_pin (int): Encoder reference pin
-            lims_pin(int): Limit switch signal
-            limnc_pin(int): Limit switch no_connect
         """
 
         # Assign motor pins
@@ -53,13 +53,6 @@ class Motor:
         # Set encoder pins
         GPIO.setup(self.eref_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(self.eref_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-        #Limit Switch Pins
-        self.lims_pin = lims_pin
-        self.limnc_pin = limnc_pin
-        #set up limit switch
-        GPIO.setup(self.lims_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(self.limnc_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def stop(self):
         """
@@ -126,11 +119,7 @@ class Motor:
                 
             # Update encoder state
             clklaststate = clkState
-            #Limit Switch emergency stop loop
-            if(self.lims_pin):
-                print("Emergency Stop!")
-                GPIO.output(self.ren_pin, False)
-                GPIO.output(self.fen_pin, False)
+            
 
             # Wait to process
             time.sleep(0.01)
