@@ -52,7 +52,7 @@ class Motor:
 
         # Set encoder pins
         GPIO.setup(self.eref_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(self.eref_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.etick_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def stop(self):
         """
