@@ -3,7 +3,7 @@ import socket
 import selectors
 import types
 import json
-import motor as motor
+import hardware_init as hardware_init
 import threading
 
 # IPs
@@ -15,10 +15,11 @@ PORT = 65432  # The port used by the server
 
 # Init motors
 # TODO make sure forward is forward for both sides
-left_motor = motor.Motor(2, 3, 4, 17, 14, 15)
-right_motor = motor.Motor(19, 26, 21, 20, 5, 6)
+left_motor = hardware_init.Motor(2, 3, 4, 17, 14, 15)
+right_motor = hardware_init.Motor(19, 26, 21, 20, 5, 6)
+robot = hardware_init.Robot(left_motor, right_motor)
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pi:
 
     # Init connection
     connected = False
@@ -26,7 +27,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
     # Attempt to connect to server
     while not connected:
         try:
-            robot.connect((HOST, PORT))
+            pi.connect((HOST, PORT))
             connected = True
         except:
             connected = False
@@ -35,7 +36,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
     while True:
 
         # Receive data
-        data = robot.recv(1024)
+        data = pi.recv(1024)
 
         # Load in data
         command = json.loads(data)
@@ -51,13 +52,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
             distance = command["DISTANCE"]
             speed = command["SPEED"]
 
-            # TODO MAKE THREAD
-            leftMotor = threading(target = left_motor.drive, args = (direction, speed, distance))
-            rightMotor = threading(target = right_motor.drive, args = (direction, speed, distance))
-            leftMotor.start()
-            rightMotor.start()
-            leftMotor.join()
-            rightMotor.join()
+            # Drive
+            robot.drive(direction, speed, distance)
+            
 
         elif(command["COMMAND_TYPE"] == "TURN"):
             # TURN
@@ -74,27 +71,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as robot:
 
             # Turn left or right
             if(direction == "LEFT"):
-                # TODO MAKE THREAD
-                leftMotor = threading(target = left_motor.drive, args = ("REVERSE", speed, heading))
-                rightMotor = threading(target = right_motor.drive, args = ("FORWARD", speed, heading))
-                leftMotor.start()
-                rightMotor.start()
-                leftMotor.join()
-                rightMotor.join()
+                # TODO 
+                pass
             elif(direction == "RIGHT"):
-                # TODO MAKE THREAD
-                leftMotor = threading(target = left_motor.drive, args = ("FORWARD", speed, heading))
-                rightMotor = threading(target = right_motor.drive, args = ("REVERSE", speed, heading))
-                leftMotor.start()
-                rightMotor.start()
-                leftMotor.join()
-                rightMotor.join()
+                # TODO
+                pass
 
         elif(command["COMMAND_TYPE"] == "STOP"):
             # STOP
             # No args
-            left_motor.stop()
-            right_motor.stop()
+            robot.stop()
 
         # Send back
         # Hits something
