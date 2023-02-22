@@ -8,12 +8,15 @@ GPIO.setwarnings(False)
 
 # Constants
 # TODO needs to be adjusted
-TICKS_PER_CM = 50
+TICKS_PER_CM = 5
+TICKS_PER_DEGREE = 10
 
 # Direction Enum
 class Direction(Enum): 
     FORWARD = 1
     REVERSE = 2
+    CLOCKWISE = 3
+    COUNTER_CLOCKWISE = 4
 
 # Return State Enum
 class returnState(Enum):
@@ -118,6 +121,12 @@ class Robot:
         left_motor_pwm = None
         right_motor_pwm = None
 
+        # Enable pins
+        GPIO.output(self.left_motor.ren_pin, True)
+        GPIO.output(self.left_motor.fen_pin, True)
+        GPIO.output(self.right_motor.ren_pin, True)
+        GPIO.output(self.right_motor.fen_pin, True)
+
         # Set direction & Setup PWM
         if (direction == Direction.FORWARD):
 
@@ -155,6 +164,7 @@ class Robot:
 
         # Drive loop
         # TODO add timeout
+        print(f"Driving {direction} {distance} centimeters")
         while (avg_ticks < destination_ticks):
 
              # Get encoder input
@@ -172,7 +182,13 @@ class Robot:
             # Update encoder state
             left_clklaststate = left_clkState
             right_clklaststate = right_clkState
+
+            # Calculate encoder average
+            avg_ticks = (left_ticks + right_ticks)/2
             
+            # Log
+            print(f"DRIVE LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
+
             # TODO check for any interrupts
             if (False):
                 return returnState.STOP_SAFETY 
@@ -184,9 +200,105 @@ class Robot:
         if (False):
             return returnState.STOP_FAIL
 
-        # Stop pwm
-        self.left_motor.stop()
-        self.right_motor.stop()
+        # Stop motors
+        self.stop()
+
+        return returnState.SUCCESS
+
+    def turn(self, direction: Direction, speed: int, degrees: int):
+        """
+        Drives robot forward or reverse a given distance at a given speed
+
+        Args:
+            direction (Direction): Direction to drive
+            speed (int): Speed to drive at
+            distance (int): Distance to drive
+        """
+
+        # Clip inputs
+        speed = abs(speed)
+        degrees = abs(degrees)
+        
+        # Init pwm
+        left_motor_pwm = None
+        right_motor_pwm = None
+
+        # Enable pins
+        GPIO.output(self.left_motor.ren_pin, True)
+        GPIO.output(self.left_motor.fen_pin, True)
+        GPIO.output(self.right_motor.ren_pin, True)
+        GPIO.output(self.right_motor.fen_pin, True)
+
+        # Set direction & Setup PWM
+        if (direction == Direction.CLOCKWISE):
+
+            # Setup PWM
+            left_motor_pwm = GPIO.PWM(self.left_motor.fpwm_pin, speed)
+            right_motor_pwm = GPIO.PWM(self.right_motor.rpwm_pin, speed)
+
+        elif (direction == Direction.COUNTER_CLOCKWISE):
+
+            # Setup PWM
+            left_motor_pwm = GPIO.PWM(self.left_motor.rpwm_pin, speed)
+            right_motor_pwm = GPIO.PWM(self.right_motor.fpwm_pin, speed)
+
+        else:
+            print("Invalid direction")
+            return returnState.STOP_FAIL
+        
+        # Calculate ticks from distance
+        # TODO calculate this better
+        destination_ticks = int(degrees * TICKS_PER_DEGREE)
+
+        # Init vars for driving
+        left_clklaststate = GPIO.input(self.left_motor.etick_pin)
+        right_clklaststate = GPIO.input(self.right_motor.etick_pin)
+
+        # Start pwm
+        left_motor_pwm.start(speed)
+        right_motor_pwm.start(speed)
+        left_motor_pwm.ChangeDutyCycle(speed)
+        right_motor_pwm.ChangeDutyCycle(speed)
+
+        # Average ticks
+        left_ticks = 0
+        right_ticks = 0
+        avg_ticks = 0
+
+        # Drive loop
+        # TODO add timeout
+        print(f"Turning {direction} {degrees} degrees")
+        while (avg_ticks < destination_ticks):
+
+             # Get encoder input
+            left_clkState = GPIO.input(self.left_motor.etick_pin)
+            right_clkState = GPIO.input(self.right_motor.etick_pin)
+
+            # Increment left ticks if encoder tick
+            if left_clkState != left_clklaststate:
+                left_ticks += 1
+                
+            # Increment right ticks if encoder tick
+            if right_clkState != right_clklaststate:
+                right_ticks += 1
+                
+            # Update encoder state
+            left_clklaststate = left_clkState
+            right_clklaststate = right_clkState
+
+            # Calculate encoder average
+            avg_ticks = (left_ticks + right_ticks)/2
+            
+            # Log
+            print(f"TURN LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
+
+            # TODO check for any interrupts
+            if (False):
+                return returnState.STOP_SAFETY 
+
+        #TODO If timeout reached
+        if (False):
+            return returnState.STOP_FAIL
 
         # Stop motors
         self.stop()
