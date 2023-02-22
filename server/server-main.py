@@ -52,16 +52,16 @@ def myThread(conn, addr, s, port):
             char = getch()
             if char == "a":
                 x = {"COMMAND_TYPE" : "TURN", #DRIVE, TURN, STOP
-                    "HEADING": 20,
+                    "DEGREES": 20,
                     "SPEED": 80,
-                    "DIRECTION": "LEFT",
+                    "DIRECTION": 4,
                     "DISTANCE": None}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "d":
                 x = {"COMMAND_TYPE" : "TURN", #DRIVE, TURN, STOP
-                    "HEADING": 20, 
+                    "DEGREES": 20, 
                     "SPEED": 80,
-                    "DIRECTION": "RIGHT",
+                    "DIRECTION": 3,
                     "DISTANCE": None}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "w":
