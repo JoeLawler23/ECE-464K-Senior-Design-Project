@@ -8,6 +8,7 @@ import threading
 import signal
 import time
 import multiprocessing
+import psutil
 from enum import Enum
 sel = selectors.DefaultSelector()
 
@@ -30,8 +31,7 @@ mySocket = 0
  
 def handler(signum, frame): #for CTRL-C for reboot
     mySocket.shutdown()
-    for i in threads:
-        mySocket.close()
+    mySocket.close()
     sys.exit()
 
 def getch(): #not necessary, just used for testing
@@ -68,15 +68,15 @@ def myThread(conn, addr, s, port):
                 x = {"COMMAND_TYPE" : "DRIVE", #DRIVE, TURN, STOP
                     "HEADING": None, 
                     "SPEED": 80,
-                    "DIRECTION": "FORWARD",
-                    "DISTANCE": 50}
+                    "DIRECTION": 1,
+                    "DISTANCE": 1}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "s":
                 x = {"COMMAND_TYPE" : "DRIVE", #DRIVE, TURN, STOP
                     "HEADING": None, 
                     "SPEED": 80,
-                    "DIRECTION": "BACKWARD",
-                    "DISTANCE": 50}
+                    "DIRECTION": 2,
+                    "DISTANCE": 1}
                 conn.sendall(bytes(json.dumps(x), encoding = 'utf8'))
             elif char == "q":
                 x = {"COMMAND_TYPE": "STOP"}
@@ -85,23 +85,41 @@ def myThread(conn, addr, s, port):
             else:
                 print(char)
 
+pid = 0
+for conn in psutil.net_connections():
+    if conn.laddr.port == PORT:
+        pid = conn.pid
+        break
 
+if pid is not 0:
+    try:
+        p = psutil.Process(pid)
+        p.terminate()
+        print(f"Terminated process with PID {pid}.")
+    except psutil.NoSuchProcess:
+        print(f"Process with PID {pid} not found.")
+    signal.signal(signal.SIGINT, handler)
 
-signal.signal(signal.SIGINT, handler)
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    mySocket = s
-    while True:
-        s.listen()
-        conn, addr = s.accept()
-        thisThread = threading.Thread(target = myThread, args = (conn, addr, s, PORT))
-        thisThread.daemon = True
-        thisThread.start()
-        threads.append(thisThread)
-for i in threads:
-    i.join()
-s.shutdown()
-s.close()
+try:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+       
+        mySocket = s
+        s.bind((HOST, PORT))
+        mySocket = s
+      
+        while True:
+            s.listen()
+            conn, addr = s.accept()
+            thisThread = threading.Thread(target = myThread, args = (conn, addr, s, PORT))
+            thisThread.daemon = True
+            thisThread.start()
+            threads.append(thisThread)
+        for i in threads:
+            i.join()
+        s.shutdown()
+        s.close()
+except:
+    print("here")
+    mySocket.close()
 
         
