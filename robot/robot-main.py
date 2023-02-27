@@ -66,11 +66,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pi:
             direction = hardware_init.Direction(command["DIRECTION"])
             distance = command["DISTANCE"]
             speed = command["SPEED"]
+
+            #TODO turn into Log statement
             print(f"Drive command received: Direction:{direction}, Distance:{distance}, Speed:{speed}",)
 
             # Drive
-            robot.drive(direction, speed, distance)
-            
+            response = robot.drive(direction, speed, distance)
+
+            # Send response
+            response = {"RESPONSE" : response.value}
+            pi.sendall(bytes(json.dumps(response), encoding = 'utf8'))         
 
         elif(command["COMMAND_TYPE"] == "TURN"):
             # TURN
@@ -82,13 +87,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pi:
             direction = hardware_init.Direction(command["DIRECTION"])
 
             # Calculate distance based on heading
-            robot.turn(direction, speed, degrees)
+            response = robot.turn(direction, speed, degrees)
+            
+            # TODO turn into log statement
             print(f"Turn command received: Direction:{direction}, Degrees:{degrees}, Speed:{speed}",)
-
+            
+            response = {"RESPONSE" : response.value}
+            pi.sendall(bytes(json.dumps(response), encoding = 'utf8'))  
         elif(command["COMMAND_TYPE"] == "STOP"):
             # STOP
             # No args
             robot.stop()
+            break
+            #TODO add response type
 
         # Send back
         # Hits something
