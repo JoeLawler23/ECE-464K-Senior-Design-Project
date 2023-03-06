@@ -4,9 +4,6 @@ import readchar
 import time
 import matplotlib.pyplot as plt
 
-# # DEMO
-# freenect-glview
-
 # Initialize the plot
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 

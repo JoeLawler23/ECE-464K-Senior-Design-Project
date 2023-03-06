@@ -18,12 +18,25 @@ PORT = 65432  # The port used by the server
 # TODO make sure forward is forward for both sides
 left_motor = hardware_init.Motor(2, 3, 4, 17, 14, 15)
 right_motor = hardware_init.Motor(19, 26, 20, 21, 5, 6)
-robot = hardware_init.Robot(left_motor, right_motor)
-# robot.drive(hardware_init.Direction.FORWARD, 100, 0.25)
+kinect = hardware_init.Kinect()
+robot = hardware_init.Robot(left_motor, right_motor, kinect)
+robot.init_plots()
+
+# TODO need a thread to update plots however since recv is a blocking call we need a while true main thread to update plots
+
+# robot.drive(hardware_init.Direction.FORWARD, 100, 40)
 # time.sleep(0.5)
-# robot.drive(hardware_init.Direction.REVERSE, 100, 0.25)
+# robot.drive(hardware_init.Direction.REVERSE, 100, 40)
 # time.sleep(0.5)
-# robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90)
+# robot.drive(hardware_init.Direction.FORWARD, 100, 20)
+# time.sleep(0.5)
+# robot.turn(hardware_init.Direction.CLOCKWISE, 100, 45)
+# time.sleep(0.5)
+# robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90)
+# time.sleep(0.5)
+# robot.turn(hardware_init.Direction.CLOCKWISE, 100, 60)
+# time.sleep(0.5)
+# robot.drive(hardware_init.Direction.REVERSE, 100, 20)
 # time.sleep(0.5)
 # robot.drive(hardware_init.Direction.FORWARD, 100, 0.25)
 # time.sleep(0.5)
@@ -50,7 +63,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pi:
 
         # Receive data
         data = pi.recv(1024)
-
+        
         print(data)
 
         # Load in data
@@ -101,10 +114,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pi:
             break
             #TODO add response type
 
-        # Send back
-        # Hits something
-        # Stops
-        # Kinect
+#         Send back
+#         Hits something
+#         Stops
+#         Kinect
 
 
 # print(f"Received {data!r}")

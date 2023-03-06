@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 from enum import Enum
+import freenect
+import matplotlib.pyplot as plt
 
 # GPIO Layout
 GPIO.setmode(GPIO.BCM)  
@@ -75,8 +77,23 @@ class LimitSwitch:
 
 class Kinect:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self):
+        # self.depth = freenect.sync_get_depth()
+        # self.video = freenect.sync_get_video()
+        print("KINECT IS SETUP")
+
+    def update_depth(self):
+        depth, _ = freenect.sync_get_depth()
+        self.depth = depth
+        # TODO return whatever distance data desired
+
+    def update_video(self):
+        video, _ = freenect.sync_get_video()
+        self.video = video
+
+    def stop(self):
+        #TODO
+        return
 
 class Speaker:
 
@@ -85,7 +102,7 @@ class Speaker:
 
 class Robot:
 
-    def __init__(self, left_motor: Motor, right_motor: Motor):
+    def __init__(self, left_motor: Motor, right_motor: Motor, kinect: Kinect):
         """
         Initializes robot with left and right motors
 
@@ -95,6 +112,44 @@ class Robot:
         """
         self.left_motor = left_motor
         self.right_motor = right_motor
+        self.kinect = kinect
+
+    def init_plots(self):
+        # Init plots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+        self.fig = fig
+        self.ax1 = ax1
+        self.ax2 = ax2
+    
+    def update_plots(self):
+        # Update the subplots in real time
+        # while True:
+        # Capture a color frame and a depth frame from the Kinect sensor
+            
+        self.kinect.update_depth()
+        self.kinect.update_video()
+
+        depth = self.kinect.depth
+        video = self.kinect.video
+
+        # Convert the video data to an RGB image
+        rgb_image = video[:, :, ::-1]
+
+        # Display the color image as a subplot
+        self.ax1.clear()
+        self.ax1.imshow(rgb_image)
+        self.ax1.set_title('Color Image')
+
+        # Display the depth map as a subplot
+        self.ax2.clear()
+        self.ax2.imshow(depth, cmap='gray')
+        self.ax2.set_title('Depth Map')
+
+        # Update the subplots with the latest data
+        plt.draw()
+        plt.pause(0.001)
+        print("PLOTS UPDATED")
 
     def stop(self):
             """
