@@ -72,8 +72,33 @@ class Motor:
 
 class LimitSwitch:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, lims_pin: int, limnc_pin: int):
+        """
+        Initializes limit switch signals
+
+        Args:
+            lims_pin(int): Limit switch signal
+            limnc_pin(int): Limit switch no_connect
+        """
+
+        #limit switch left: channel A- 9, channel B- 11
+        #limit switch right: channel A- 7, channel B- 8
+
+        #Limit Switch Pins
+        self.lims_pin = lims_pin
+        self.limnc_pin = limnc_pin 
+
+        #set up limit switch
+        GPIO.setup(lims_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(limnc_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+    def getState(self):
+
+        # Return True if interrupted
+        if (GPIO.input(self.limnc_pin) == GPIO.LOW):
+            return True
+        return False
+ 
 
 class Kinect:
 
@@ -92,7 +117,8 @@ class Kinect:
         self.video = video
 
     def stop(self):
-        #TODO
+        freenect_stop_video()
+        freenect_stop_depth()
         return
 
 class Speaker:
@@ -102,7 +128,7 @@ class Speaker:
 
 class Robot:
 
-    def __init__(self, left_motor: Motor, right_motor: Motor, kinect: Kinect):
+    def __init__(self, left_motor: Motor, right_motor: Motor, kinect: Kinect, left_limit_switch: LimitSwitch, right_limit_switch: LimitSwitch):
         """
         Initializes robot with left and right motors
 
@@ -113,6 +139,8 @@ class Robot:
         self.left_motor = left_motor
         self.right_motor = right_motor
         self.kinect = kinect
+        self.left_limit_switch = left_limit_switch
+        self.right_limit_switch = right_limit_switch
 
     def init_plots(self):
         # Init plots
@@ -242,10 +270,10 @@ class Robot:
             avg_ticks = (left_ticks + right_ticks)/2
             
             # Log
-            print(f"DRIVE LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
+            # print(f"DRIVE LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
 
             # TODO check for any interrupts
-            if (False):
+            if (self.left_limit_switch.getState() or self.right_limit_switch.getState()):
                 return returnState.STOP_SAFETY 
 
             # Wait to process
@@ -345,10 +373,10 @@ class Robot:
             avg_ticks = (left_ticks + right_ticks)/2
             
             # Log
-            print(f"TURN LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
+            # print(f"TURN LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
 
             # TODO check for any interrupts
-            if (False):
+            if (self.left_limit_switch.getState() or self.right_limit_switch.getState()):
                 return returnState.STOP_SAFETY 
 
         #TODO If timeout reached
