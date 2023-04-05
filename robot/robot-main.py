@@ -107,12 +107,12 @@ def test_3():
 
 def test_4():
     while(True):
-        if (robot.drive(hardware_init.Direction.FORWARD, 100, 100) != hardware_init.returnState.SUCCESS):
+        if (robot.drive(hardware_init.Direction.FORWARD, 100, 50) != hardware_init.returnState.SUCCESS):
             print("STOPPED")
             # play_audio()
             return
         time.sleep(0.5)
-        if (robot.drive(hardware_init.Direction.REVERSE, 100, 100) != hardware_init.returnState.SUCCESS):
+        if (robot.drive(hardware_init.Direction.REVERSE, 100, 50) != hardware_init.returnState.SUCCESS):
             print("STOPPED")
             # play_audio()
             return
