@@ -22,27 +22,27 @@ PORT = 65432  # The port used by the server
 #         pass
 
 def test_1():
-    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 40) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 180) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 80) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 180) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 40) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
