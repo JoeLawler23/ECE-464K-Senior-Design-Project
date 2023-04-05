@@ -32,7 +32,7 @@ def test_1():
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.drive(hardware_init.Direction.FORWARD, 100, 70) != hardware_init.returnState.SUCCESS):
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 55) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
