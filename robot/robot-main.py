@@ -7,7 +7,7 @@ import hardware_init as hardware_init
 import threading
 import time
 from multiprocessing import Process
-import pygame
+# import pygame
 
 # IPs
 # robot - 1: 100.75.56.66
@@ -16,12 +16,12 @@ import pygame
 HOST = "100.107.15.32"  # The server's hostname or IP address
 PORT = 65432  # The port used by the server
 
-def play_audio():
-    pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy():
-        pass
+# def play_audio():
+#     pygame.mixer.music.play()
+#     while pygame.mixer.music.get_busy():
+#         pass
 
-def test1():
+def test_1():
     if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
@@ -49,6 +49,74 @@ def test1():
     time.sleep(0.5)
     print("SUCCESS")
 
+def test_2():
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    print("SUCCESS")
+
+def test_3():
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+        print("STOPPED")
+        # play_audio()
+        return
+    time.sleep(0.5)
+    print("SUCCESS")
+
+def test_4():
+    while(True):
+        if (robot.drive(hardware_init.Direction.FORWARD, 100, 100) != hardware_init.returnState.SUCCESS):
+            print("STOPPED")
+            # play_audio()
+            return
+        time.sleep(0.5)
+        if (robot.drive(hardware_init.Direction.REVERSE, 100, 100) != hardware_init.returnState.SUCCESS):
+            print("STOPPED")
+            # play_audio()
+            return
+        time.sleep(0.5)
 
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pi:
 
@@ -134,4 +202,25 @@ robot = hardware_init.Robot(left_motor, right_motor, kinect, left_limit_switch, 
 # robot.init_plots()
 # plots = Process(target = robot.update_plots)
 # plots.start()
-test1()
+
+# Get the command-line argument and convert it to an integer
+try:
+    arg = int(sys.argv[1])
+except IndexError:
+    print("Error: argument not provided")
+    sys.exit()
+except ValueError:
+    print("Error: argument must be an integer")
+    sys.exit()
+
+# Check if the argument is within the valid range and call the appropriate function
+if arg == 1:
+    test_1()
+elif arg == 2:
+    test_2()
+elif arg == 3:
+    test_3()
+elif arg == 4:
+    test_4()
+else:
+    print("Error: argument must be between 1 and 3")

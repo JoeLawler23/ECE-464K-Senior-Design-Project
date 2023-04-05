@@ -270,7 +270,7 @@ class Robot:
             avg_ticks = (left_ticks + right_ticks)/2
             
             # Log
-            # print(f"DRIVE LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
+            print(f"DRIVE LOOP: average: {avg_ticks}, left: {left_ticks}, right: {right_ticks}, destination: {destination_ticks}")
 
             # TODO check for any interrupts
             if (self.left_limit_switch.getState() or self.right_limit_switch.getState()):
