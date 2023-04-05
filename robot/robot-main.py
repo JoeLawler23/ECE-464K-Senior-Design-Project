@@ -55,22 +55,7 @@ def test_2():
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
-        print("STOPPED")
-        # play_audio()
-        return
-    time.sleep(0.5)
-    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
-        print("STOPPED")
-        # play_audio()
-        return
-    time.sleep(0.5)
-    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
-        print("STOPPED")
-        # play_audio()
-        return
-    time.sleep(0.5)
-    if (robot.drive(hardware_init.Direction.FORWARD, 100, 20) != hardware_init.returnState.SUCCESS):
+    if (robot.drive(hardware_init.Direction.REVERSE, 100, 20) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
@@ -83,7 +68,7 @@ def test_3():
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
@@ -93,7 +78,7 @@ def test_3():
         # play_audio()
         return
     time.sleep(0.5)
-    if (robot.turn(hardware_init.Direction.CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
+    if (robot.turn(hardware_init.Direction.COUNTER_CLOCKWISE, 100, 90) != hardware_init.returnState.SUCCESS):
         print("STOPPED")
         # play_audio()
         return
